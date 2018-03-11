@@ -1,37 +1,156 @@
-System.setProperty("webdriver.chrome.driver", "D:/webdriver chrome/chromedriver.exe");
-        WebDriver driver = new ChromeDriver();
+package com.company;
+
+
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.nio.channels.SelectableChannel;
+
+
+public class Calculator {
+
+    int a = 35;
+    int b = 999;
+    int c = 100;
+    int d = 4;
+    int e = a * b + (c / d);
+    int result = 34990;
+
+    public static void main(String[] args) throws InterruptedException {
+        // write your code here
+
+        System.setProperty ("webdriver.chrome.driver", "D:/webdriver chrome/chromedriver.exe");
+        WebDriver driver = new ChromeDriver ();
 
         String baseURL = "http://web2.0calc.com/";
 
-        driver.manage().window().maximize();
-        driver.get(baseURL);
+        driver.manage ().window ().maximize ();
+        driver.get (baseURL);
 
-        System.out.println("Test #1 - check the calculation of 1*2+(8/4)");
-        int a = 1;
-        int b = 2;
-        int c = 8;
+        System.out.println ("Test #1 - check the calculation of 35*999+(100/4)");
+        int a = 35;
+        int b = 999;
+        int c = 100;
         int d = 4;
         int e = a * b + (c / d);
 
+
         //convert int to string
-        StringBuilder sb = new StringBuilder();
-        sb.append(e);
-        String str1 = Integer.toString(e);
+        StringBuilder sb = new StringBuilder ();
+        sb.append (e);
+        String str1 = Integer.toString (e);
+        String str2 = Integer.toString (a);
+        String str3 = Integer.toString (b);
+        String str4 = Integer.toString (c);
+        String str5 = Integer.toString (d);
 
-        WebElement framePath = driver.findElement(By
-                .id("input"));
-        framePath.sendKeys(str1);
-        System.out.println("The result of calucation is " + e);
-        //check if the result = 4
+        //create element for the frame
+        WebElement framePath = driver.findElement (By
+                .id ("input"));
 
+        //put credentials
+        framePath.sendKeys (str2);
+        framePath.sendKeys ("*");
+        framePath.sendKeys (str3);
+        framePath.sendKeys ("+(");
+        framePath.sendKeys (str4);
+        framePath.sendKeys ("/");
+        framePath.sendKeys (str5);
+        framePath.sendKeys (")");
+        framePath.sendKeys (Keys.ENTER);
+        Thread.sleep (2000);
+
+        //compare results
         String frameValue = framePath
-                .getAttribute("value");
-        System.out.println("The result in the calculator is "
+                .getAttribute ("value");
+        System.out.println ("The result in the calculator is "
                 + frameValue);
 
-        if (Integer.toString(e) == frameValue) {
-            System.out.println("The result is correct");
+        if (str1.equals(frameValue)) {
+            System.out.println ("The result is correct");
         } else {
-            System.out.println("The result is KO");
+            System.out.println ("The result is KO");
         }
-        framePath.clear();
+        //framePath.clear (); - it removes the history record
+        driver.findElement (By
+                .cssSelector ("button[id='BtnClear']"))
+                .click ();
+
+
+        System.out.println ("Test #2 - Calculate cos(pi) with the rad radio button and assert the correct result -1");
+
+        int radioButtons = driver
+                .findElements (By
+                        .xpath ("//input[@type='radio']"))
+                .size ();
+
+        for (int i = 0; i < radioButtons; i++) {
+            String trigoButton = driver.findElements (By.xpath ("//input[@name='radi']")).get (i).getAttribute ("id");
+            if (trigoButton.equals ("trigorad")) {
+                driver.findElements (By
+                        .xpath ("//input[@name='radi']"))
+                        .get (i)
+                        .click ();
+            }
+        }
+
+        driver.findElement (By
+                .cssSelector ("button[id='BtnCos']"))
+                .click ();
+        driver.findElement (By
+                .cssSelector ("button[id='BtnPi']"))
+                .click ();
+
+        framePath.sendKeys (")");
+        framePath.sendKeys (Keys.ENTER);
+
+        WebDriverWait wd= new WebDriverWait (driver, 10);
+        wd.until(ExpectedConditions.attributeContains (framePath, "value", "-1"));
+
+        String value= (framePath.getAttribute ("value"));
+
+        System.out.println ("The result in the calculator is "+value);
+
+        String sqrt= "-1";
+
+        if(sqrt.equals (value)){
+            System.out.println ("The result is correct");
+        } else {
+            System.out.println ("The result is KO");
+        }
+
+
+        driver.findElement (By
+                .cssSelector ("button[id='BtnClear']"))
+                .click ();
+
+
+        //TUTAJ SIE CRASHUJE
+        System.out.println ("Test #3 - Calculate sqrt(81) and assert assert the correct result 9.");
+
+        driver.findElement (By
+                .cssSelector ("button[id='BtnClear']"))
+                .click ();
+        framePath.sendKeys ("sqrt(81)");
+        framePath.sendKeys (Keys.ENTER);
+        wd.until(ExpectedConditions.attributeContains (framePath, "title", "9")); //CRASH
+
+        System.out.println ("The result in the calculator is "+value);
+        /*driver.findElement (By
+                .cssSelector ("button[id='BtnClear']"))
+                .click ();
+
+        System.out.println ("Test #4 - Press history dropdown and assert that the list contains the 3 operations executed e.g. 35*999+(100/4)=, cos(pi),sqrt(81)");
+*/
+
+        driver.quit ();
+
+    }
+}
