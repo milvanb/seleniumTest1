@@ -1,0 +1,37 @@
+System.setProperty("webdriver.chrome.driver", "D:/webdriver chrome/chromedriver.exe");
+        WebDriver driver = new ChromeDriver();
+
+        String baseURL = "http://web2.0calc.com/";
+
+        driver.manage().window().maximize();
+        driver.get(baseURL);
+
+        System.out.println("Test #1 - check the calculation of 1*2+(8/4)");
+        int a = 1;
+        int b = 2;
+        int c = 8;
+        int d = 4;
+        int e = a * b + (c / d);
+
+        //convert int to string
+        StringBuilder sb = new StringBuilder();
+        sb.append(e);
+        String str1 = Integer.toString(e);
+
+        WebElement framePath = driver.findElement(By
+                .id("input"));
+        framePath.sendKeys(str1);
+        System.out.println("The result of calucation is " + e);
+        //check if the result = 4
+
+        String frameValue = framePath
+                .getAttribute("value");
+        System.out.println("The result in the calculator is "
+                + frameValue);
+
+        if (Integer.toString(e) == frameValue) {
+            System.out.println("The result is correct");
+        } else {
+            System.out.println("The result is KO");
+        }
+        framePath.clear();
